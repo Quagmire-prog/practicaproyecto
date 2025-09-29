@@ -1,0 +1,36 @@
+{% extends 'base.html' %} {% block titulo %} Formulario {% endblock titulo %} {%
+block contenido %}
+<h1>formulario</h1>
+
+{% if user %}
+<li><b>Numero de cedula:</b>{{user.numeroc}}</li>
+<li><b>Nombre:</b>{{user.nombre}}</li>
+<li><b>Apellidos:</b>{{user.apellidos}}</li>
+<li><b>Direccion:</b>{{user.direccion}}</li>
+<li><b>Mensaje:</b>{{user.mensaje}}</li>
+{% endif %}
+
+<form action="" method="post">
+  <label for="numeroc">Numero de cedula:</label>
+  <input type="text" id="numeroc" name="numeroc" />
+  <br />
+
+  <label for="nombre">Nombre:</label>
+  <input type="text" id="nombre" name="nombre" />
+  <br />
+
+  <label for="apellidos">Apellidos:</label>
+  <input type="text" id="apellidos" name="apellidos" />
+  <br />
+
+  <label for="direccion">Direccion:</label>
+  <input type="text" id="direccion" name="direccion" />
+  <br />
+
+  <label for="mensaje">Mensaje:</label>
+  <textarea id="mensaje" name="mensaje"></textarea>
+  <br />
+
+  <button style="background: linear-gradient(90deg, #1b2c55,#3d85a9,#63cac8,#b8edff);" type="submit">Enviar</button>
+  {% endblock %}
+</form>

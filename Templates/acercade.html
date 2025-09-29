@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Acerca de{% endblock %}
+
+{% block contenido %}
+
+<!-- Encabezado con imagen -->
+<div class="container mt-5">
+  <div class="text-center">
+    <img src="{{ url_for('static', filename='Image/Titan_Motors.png ') }}" 
+         class="img-fluid rounded shadow-sm mb-4" 
+         alt="Titan Motors - Tu camino hacia el vehículo perfecto" 
+         style="max-height: 150px; object-fit: cover;">
+  </div>
+  <h2 class="text-center mb-4">ACERCA DE Titan Motors</h2>
+  <p class="text-center">
+    En <strong>Titan Motors</strong>
+    nos especializamos en ofrecer vehículos que combinan potencia, 
+    tecnología y diseño. Desde <strong>camiones robustos</strong> preparados para el trabajo más exigente, 
+    hasta <strong>camionetas versátiles</strong> para cada estilo de vida y <strong>superdeportivos exclusivos</strong> que despiertan adrenalina, 
+    contamos con una amplia gama de opciones para nuestros clientes.
+Nuestra prioridad es brindar calidad, confianza y un servicio personalizado, 
+porque entendemos que cada vehículo representa mucho más que transporte: 
+es una inversión, un estilo de vida y una pasión.  
+ 
+
+<!-- Misión, Visión, Objetivo -->
+<div class="container mt-5">
+  <div class="row text-center">
+    <div class="col-sm-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Misión</h5>
+          <p class="card-text">
+           Ofrecer a nuestros clientes <strong>vehículos de la más alta calidad</strong>, adaptados a sus necesidades, ya sea trabajo, aventura o lujo, garantizando una experiencia de compra transparente, confiable y emocionante.
+Nos comprometemos a crear relaciones duraderas con nuestros clientes, respaldadas por un servicio de postventa de primer nivel.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Visión</h5>
+          <p class="card-text">
+           Convertirnos en el
+            <strong>líder y referente en la venta de camiones, camionetas y superdeportivos en la región</strong>
+            , reconocido por la excelencia en el servicio, la innovación en nuestra oferta 
+            y la confianza de nuestros clientes.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Valores -->
+<div class="container mt-5">
+  <h2 class="text-center mb-4">NUESTROS VALORES</h2>
+  <div class="row text-center">
+    <div class="col-sm-3">
+      <div class="card shadow-sm">
+        <img src="{{ url_for('static', filename='Image/innovacion.jpg') }}" class="card-img-top" alt="Innovación">
+        <div class="card-body">
+          <h5 class="card-title">Innovación</h5>
+          <p class="card-text">Nos mantenemos a la vanguardia en tendencias automotrices.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div class="card shadow-sm">
+        <img src="{{ url_for('static', filename='Image/compromiso.jpg') }}" class="card-img-top" alt="Compromiso">
+        <div class="card-body">
+          <h5 class="card-title">Pasión</h5>
+          <p class="card-text">Amamos lo que hacemos y lo transmitimos en cada entrega.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div class="card shadow-sm">
+        <img src="{{ url_for('static', filename='Image/accesibilidad.jpg') }}" class="card-img-top" alt="Accesibilidad">
+        <div class="card-body">
+          <h5 class="card-title">confianza</h5>
+          <p class="card-text">Somos un concesionario transparente y honesto en cada proceso.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div class="card shadow-sm">
+        <img src="{{ url_for('static', filename='Image/eficiencia.jpg') }}" class="card-img-top" alt="Eficiencia">
+        <div class="card-body">
+          <h5 class="card-title">Calidad</h5>
+          <p class="card-text">Seleccionamos vehículos que cumplen con los más altos estándares.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
