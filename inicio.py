@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_mysqldb import MySQL
 from flask import make_response, send_file
 import io
-import pandas as pd
+# import pandas as pd
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
@@ -23,24 +23,24 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 mysql.init_app(app) #inicializa la conexion a la DB
 
 
-@app.route('/exportar_excel')
-def exportar_excel():
-    cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM productos")
-    productos = cursor.fetchall()
-    cursor.close()
+# @app.route('/exportar_excel')
+# def exportar_excel():
+#     cursor = mysql.connection.cursor()
+#     cursor.execute("SELECT * FROM productos")
+#     productos = cursor.fetchall()
+#     cursor.close()
 
-    # Crear DataFrame
-    df = pd.DataFrame(productos)
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='Productos')
+#     # Crear DataFrame
+#     df = pd.DataFrame(productos)
+#     output = io.BytesIO()
+#     with pd.ExcelWriter(output, engine='openpyxl') as writer:
+#         df.to_excel(writer, index=False, sheet_name='Productos')
 
-    output.seek(0)
-    return send_file(output,
-                     as_attachment=True,
-                     download_name="productos.xlsx",
-                     mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+#     output.seek(0)
+#     return send_file(output,
+#                      as_attachment=True,
+#                      download_name="productos.xlsx",
+#                      mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 # ✅ Exportar productos a PDF
 @app.route('/exportar_pdf')
