@@ -1,10 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mysqldb import MySQL
-from flask import make_response, send_file
-import io
-# import pandas as pd
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
+
 
 app=Flask(__name__, template_folder='Templates') #crea la app
 
