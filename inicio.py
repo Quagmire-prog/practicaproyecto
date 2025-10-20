@@ -9,34 +9,34 @@ app.secret_key = 'appsecretkey' #clave secreta para la sesion
 mysql=MySQL() #inicializa la conexion a la DB
 
 # conexion a la DB
-app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_HOST'] = 'bdektgg7gg1apvivnkyb-mysql.services.clever-cloud.com'
 app.config['MYSQL_PORT'] = 3306
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'ventas'
+app.config['MYSQL_USER'] = 'uke6o5qgonvpilex'
+app.config['MYSQL_PASSWORD'] = 'FomMBB9eBL0w6bLQxDrv'
+app.config['MYSQL_DB'] = 'bdektgg7gg1apvivnkyb'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql.init_app(app) #inicializa la conexion a la DB
 
 
-# @app.route('/exportar_excel')
-# def exportar_excel():
-#     cursor = mysql.connection.cursor()
-#     cursor.execute("SELECT * FROM productos")
-#     productos = cursor.fetchall()
-#     cursor.close()
+@app.route('/exportar_excel')
+def exportar_excel():
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM productos")
+    productos = cursor.fetchall()
+    cursor.close()
 
-#     # Crear DataFrame
-#     df = pd.DataFrame(productos)
-#     output = io.BytesIO()
-#     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-#         df.to_excel(writer, index=False, sheet_name='Productos')
+    # Crear DataFrame
+    df = pd.DataFrame(productos)
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Productos')
 
-#     output.seek(0)
-#     return send_file(output,
-#                      as_attachment=True,
-#                      download_name="productos.xlsx",
-#                      mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    output.seek(0)
+    return send_file(output,
+                     as_attachment=True,
+                     download_name="productos.xlsx",
+                     mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 # ✅ Exportar productos a PDF
 @app.route('/exportar_pdf')
@@ -83,11 +83,12 @@ def accesologin():
             if user:
                 session['usuario'] = user['email']
                 session['rol'] = user['id_rol']
+                session['nombre'] = user['nombre']
                 
                 if user['id_rol'] == 1:
-                    return render_template("admin.html")
+                    return redirect(url_for('admin'))
                 else:
-                    return render_template("inicio.html")
+                    return redirect(url_for('inicio'))
             else:
                 flash('Usuario y contraseña son incorrectos', 'danger')
                 return render_template("login.html")
@@ -151,19 +152,34 @@ def Registro():
         password = request.form.get('password')
         id_rol = 2  # Rol usuario por defecto
 
+        # Validar que el correo no exista
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM usuario WHERE email = %s", (email,))
+        existing_user = cur.fetchone()
+        if existing_user:
+            flash('El correo ya está registrado. Por favor inicia sesión.', 'warning')
+            cur.close()
+            return redirect(url_for('login'))
+
         try:
-            cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO usuario (nombre, email, password, id_rol) VALUES (%s, %s, %s, %s)",
-                          (nombre, email, password, id_rol))
+            # Insertar usuario
+            cur.execute(
+                "INSERT INTO usuario (nombre, email, password, id_rol) VALUES (%s, %s, %s, %s)",
+                (nombre, email, password, id_rol)
+            )
             mysql.connection.commit()
             cur.close()
+
             flash('Registro exitoso. Ahora puedes iniciar sesión.', 'success')
             return redirect(url_for('login'))
+
         except Exception as e:
+            cur.close()
             flash(f'Error durante el registro: {e}', 'danger')
             return redirect(url_for('Registro'))
 
-    return render_template ('Registro.html')
+    return render_template('Registro.html')
+
 
 @app.route('/Catalogo')
 def Catalogo():
@@ -211,6 +227,63 @@ def listar_productos():
         productos = cursor.fetchall()
         cursor.close()
         return render_template("ListaDeProductos.html", productos=productos)
+
+@app.route('/perfil')
+def perfil():
+    if 'usuario' in session:
+        return render_template('perfil.html', usuario=session['usuario'], nombre=session.get('nombre'))
+    else:
+        flash('Debes iniciar sesión para ver esta página.', 'warning')
+        return redirect(url_for('login'))
+
+@app.route('/editar_perfil', methods=['GET', 'POST'])
+def editar_perfil():
+    if 'usuario' not in session:
+        flash('Debes iniciar sesión para editar tu perfil.', 'warning')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        nuevo_nombre = request.form.get('nombre')
+        nuevo_email = request.form.get('email')
+        nueva_password = request.form.get('password')
+
+        try:
+            conexion = mysql.connection
+            cursor = conexion.cursor()
+            cursor.execute("""
+                UPDATE usuario
+                SET nombre=%s, email=%s, password=%s
+                WHERE email=%s
+            """, (nuevo_nombre, nuevo_email, nueva_password, session['usuario']))
+            conexion.commit()
+            cursor.close()
+
+            session['nombre'] = nuevo_nombre
+            session['usuario'] = nuevo_email
+
+            flash('Perfil actualizado correctamente.', 'success')
+            return redirect(url_for('perfil'))
+
+        except Exception as e:
+            flash(f'Error al actualizar perfil: {e}', 'danger')
+            return redirect(url_for('editar_perfil'))
+
+    # GET: mostrar formulario con datos actuales
+    return render_template(
+        'editar_perfil.html',
+        nombre=session.get('nombre'),
+        email=session.get('usuario')
+    )
+
+
+@app.route('/perfilAdmin')
+def perfilAdmin():
+    if 'usuario' in session:
+        return render_template('PerfilAdmin.html', usuario=session['usuario'], nombre=session.get('nombre'))
+    else:
+        flash('Debes iniciar sesión para ver esta página.', 'warning')
+        return redirect(url_for('login'))
+    
 
 @app.route('/agregar_producto', methods=['GET', 'POST'])
 def agregar_producto():

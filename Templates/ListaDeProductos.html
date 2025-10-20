@@ -1,39 +1,129 @@
 {% extends 'baseadmin.html' %}
 
-{% block title %} Lista de Productos {% endblock %}
+{% block title %}Lista de Productos{% endblock %}
 
 {% block body %}
 
-<!-- MENSAJE DE ALERTA SweetAlert2 -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-<ul class="flashes">
-    {% for category, message in messages %}
-    <script type="text/javascript">
-        const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-            }
-        });
-        Toast.fire({
-            icon: "{{ category }}",
-            title: "{{ message }}"
-        });
-    </script>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
+<div class="container my-5">
+    <h1 class="text-center mb-4"><i class="bi bi-card-list"></i> Lista de Productos</h1>
 
-<!-- MENSAJE DE ALERTA PARA ELIMINACION SweetAlert2 -->
+    <!-- Mensajes SweetAlert2 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <script>
+            Swal.fire({
+                toast: true,
+                position: "top-end",
+                icon: "{{ category }}",
+                title: "{{ message }}",
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
+            });
+        </script>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% if productos %}
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ url_for('agregar_producto') }}" class="btn btn-primary">
+            ➕ Agregar Producto
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table id="productos-table" class="table table-hover table-striped table-bordered align-middle">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Stock</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr class="text-center">
+                    <td>{{ loop.index }}</td> <!-- Índice de producto -->
+                    <td>{{ producto.nombreproductos }}</td>
+                    <td>${{ "%.2f"|format(producto.precio) }}</td>
+                    <td>{{ producto.stock }}</td>
+                    <td>
+                        <a href="#" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modaledit{{ producto.id }}">
+                            Editar
+                        </a>
+                        <a href="#" class="btn btn-danger btn-sm btn-eliminar" data-id="{{ producto.id }}">
+                            Eliminar
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- Modal Editar Producto -->
+                <div class="modal fade" id="modaledit{{ producto.id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-dark text-white">
+                                <h5 class="modal-title">Editar Producto</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form action="{{ url_for('editar_producto', id=producto.id) }}" method="POST">
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label>Nombre del producto</label>
+                                        <input type="text" name="nombreproductos" class="form-control" value="{{ producto.nombreproductos }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Precio</label>
+                                        <input type="number" step="0.01" name="precio" class="form-control" value="{{ producto.precio }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Stock</label>
+                                        <input type="number" name="stock" class="form-control" value="{{ producto.stock }}" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Actualizar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <div class="text-center mt-4">
+        <p>No hay productos registrados.</p>
+        <a href="{{ url_for('agregar_producto') }}" class="btn btn-primary">Agregar mi primer producto</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
 <script>
-    function confirmarEliminacion(url) {
+$(document).ready(function() {
+    // Inicializar DataTables
+    var table = $('#productos-table').DataTable({
+        dom: 'Bfrtip',
+        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+        }
+    });
+
+    // Delegar evento de eliminación
+    $('#productos-table').on('click', '.btn-eliminar', function(e) {
+        e.preventDefault();
+        var productoId = $(this).data('id');
+
         Swal.fire({
             title: '¿Estás seguro?',
             text: "¡No podrás revertir esto!",
@@ -45,136 +135,10 @@
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = url;
+                window.location.href = '/eliminar_producto/' + productoId;
             }
         });
-    }
+    });
+});
 </script>
-<script>
-function copiarPortapapeles() {
-    const tabla = document.querySelector("table").outerText;
-    navigator.clipboard.writeText(tabla)
-        .then(() => {
-            Swal.fire({
-                icon: 'success',
-                title: 'Copiado al portapapeles',
-                showConfirmButton: false,
-                timer: 1500
-            });
-        })
-        .catch(err => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error al copiar',
-                text: err
-            });
-        });
-}
-</script>
-
-
-<h1 class="text-center">Lista de Productos</h1>
-<div class="caja">
-
-    {% if productos %}
-    <div class="d-flex justify-content-between mb-3">
-        <div>
-            <button class="btn btn-outline-primary"
-                onclick="copiarPortapapeles()">📋 Copiar</button>
-            <a href="{{ url_for('exportar_excel') }}"
-                class="btn btn-outline-success">📊 Exportar Excel</a>
-            <a href="{{ url_for('exportar_pdf') }}"
-                class="btn btn-outline-danger">📄 Exportar PDF</a>
-        </div>
-        <a href="{{ url_for('agregar_producto') }}" class="btn btn-primary">➕
-            Agregar Producto</a>
-    </div>
-    <table class="table table-hover table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Nombre</th>
-                <th scope="col">Precio</th>
-                <th scope="col">Stock</th>
-                <th scope="col">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for producto in productos %}
-            <tr>
-                <td>{{ producto.id }}</td>
-                <td>{{ producto.nombreproductos }}</td>
-                <td>{{ producto.precio }}</td>
-                <td>{{ producto.stock }}</td>
-                <td>
-                    <a href="#" class="btn btn-success btn-sm"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modaledit{{ producto.id }}">Editar</a>
-                    <a href="javascript:void(0);"
-                        title="Eliminar producto..."
-                        onclick="confirmarEliminacion('/eliminar_producto/{{ producto.id }}')"
-                        class="btn btn-danger btn-sm">Eliminar</a>
-                </td>
-            </tr>
-
-            <!-- MODAL EDITAR PRODUCTO -->
-            <div class="modal fade" id="modaledit{{ producto.id }}"
-                data-bs-backdrop="static"
-                data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header"
-                            style="background: linear-gradient(220deg, #ffffff, #7a9f7a, #355e3b);">
-                            <h4 class="modal-title text-white">Editar
-                                Producto</h4>
-                            <button type="button" class="btn-close"
-                                data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <form
-                            action="{{ url_for('editar_producto', id=producto.id) }}"
-                            method="POST">
-                            <div class="modal-body">
-                                <div class="form-group mb-2">
-                                    <label>Nombre del producto</label>
-
-                                    <input type="text" name="nombreproductos"
-                                        class="form-control"
-                                        value="{{ producto.nombreproductos }}"
-                                        required>
-                                </div>
-
-                                <div class="form-group mb-2">
-                                    <label>Precio</label>
-                                    <input type="number" step="0.01"
-                                        name="precio"
-                                        class="form-control"
-                                        value="{{ producto.precio }}" required>
-                                </div>
-                                <div class="form-group mb-2">
-                                    <label>Stock</label>
-                                    <input type="number" name="stock"
-                                        class="form-control"
-                                        value="{{ producto.stock }}" required>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary"
-                                    data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit"
-                                    class="btn btn-primary">Actualizar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <!-- FIN MODAL EDITAR PRODUCTO -->
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p class="text-center mt-4">No hay productos registrados.</p>
-    {% endif %}
-</div>
-
 {% endblock %}

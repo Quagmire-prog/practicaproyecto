@@ -1,37 +1,152 @@
 {% extends 'baseadmin.html' %}
 {% block title %}Lista de Usuarios{% endblock %}
+
 {% block body %}
+<div class="container my-5">
 
-<!-- MENSAJE DE ALERTA SweetAlert2 -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-<ul class="flashes">
-    {% for category, message in messages %}
-    <script type="text/javascript">
-        const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-            }
-        });
-        Toast.fire({
-            icon: "success",
-            title: "{{ message }}"
-        });
-    </script>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul class="flashes">
+            {% for category, message in messages %}
+            <script>
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    icon: "{{ category }}",
+                    title: "{{ message }}"
+                });
+            </script>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
 
-<!-- MENSAJE DE ALERTA PARA ELIMINACION SweetAlert2 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-people-fill"></i> Lista de Usuarios</h1>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregarUsuario">
+            Agregar Usuario
+        </button>
+    </div>
+
+    <!-- Modal Agregar Usuario -->
+    <div class="modal fade" id="modalAgregarUsuario" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registro de Usuarios</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('guardar_usuario') }}" method="POST">
+                        <div class="form-floating mb-2">
+                            <input type="text" class="form-control" name="nombre" placeholder="Nombre Completo" required>
+                            <label>Nombre Completo</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input type="email" class="form-control" name="email" placeholder="Correo Electrónico" required>
+                            <label>Correo Electrónico</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input type="password" class="form-control" name="password" placeholder="Contraseña" required>
+                            <label>Contraseña</label>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if usuarios %}
+    <div class="table-responsive">
+        <table id="usuarios-table" class="table table-striped table-hover table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Correo</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mostrar in usuarios %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ mostrar.nombre }}</td>
+                    <td>{{ mostrar.email }}</td>
+                    <td>
+                        <a href="#" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditUsuario{{ mostrar.id }}">Editar</a>
+                        <a href="#" class="btn btn-danger btn-sm btn-eliminar" data-id="{{ mostrar.id }}">Eliminar</a>
+                    </td>
+                </tr>
+
+                <!-- Modal Editar Usuario -->
+                <div class="modal fade" id="modalEditUsuario{{ mostrar.id }}" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Actualizar Información</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{ url_for('updateUsuario') }}" method="POST">
+                                    <input type="hidden" name="id" value="{{ mostrar.id }}">
+                                    <div class="mb-2">
+                                        <label>Nombre</label>
+                                        <input type="text" class="form-control" name="nombre" value="{{ mostrar.nombre }}">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label>Correo Electrónico</label>
+                                        <input type="email" class="form-control" name="email" value="{{ mostrar.email }}">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label>Contraseña</label>
+                                        <input type="text" class="form-control" name="password" value="{{ mostrar.password }}">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center">
+        <p>No hay usuarios registrados.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
 <script>
-    function confirmarEliminacion(url) {
+$(document).ready(function() {
+    // Inicializar DataTables con exportación
+    var table = new DataTable('#usuarios-table', {
+        dom: 'Bfrtip',
+        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+        }
+    });
+
+    // Evento SweetAlert2 para eliminar
+    $('#usuarios-table').on('click', '.btn-eliminar', function(e) {
+        e.preventDefault();
+        var usuarioId = $(this).data('id');
         Swal.fire({
             title: '¿Estás seguro?',
             text: "¡No podrás revertir esto!",
@@ -43,170 +158,10 @@
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = url;
+                window.location.href = '/borraruser/' + usuarioId;
             }
         });
-    }
+    });
+});
 </script>
-
-<div class="container p-5 mt-3">
-    <!-- MODAL agregar un nuevo usuario -->
-    <div class="card">
-        <div class="card-body shadow-lg rounded"
-            style="background: linear-gradient(220deg, #ffffff, #7a9f7a, #355e3b);">
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-outline-success float-end"
-                data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Agregar Usuario
-            </button>
-
-            <!-- Modal -->
-            <div class="modal fade" data-bs-backdrop="static"
-                data-bs-keyboard="false" id="exampleModal" tabindex="-1"
-                aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <!-- Centrar el formulario -->
-                    <div class="modal-content">
-                        <div class="modal-header"
-                            style="background: linear-gradient(220deg, #ffffff, #7a9f7a, #355e3b);">
-                            <h1 class="modal-title fs-5 text-white"
-                                id="exampleModalLabel">Registro de Usuarios</h1>
-                            <button type="button" class="btn-close"
-                                data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="{{ url_for('guardar_usuario') }}"
-                                method="POST">
-                                <div class="form-floating mb-2">
-                                    <input type="text" class="form-control"
-                                        name="nombre" id="name"
-                                        placeholder="Nombre Completo" required>
-                                    <label for="nombre"
-                                        class="form-label">Nombre
-                                        Completo</label>
-                                </div>
-                                <div class="form-floating mb-2">
-                                    <input type="text" class="form-control"
-                                        name="email" id="email"
-                                        placeholder="Correo Electrónico"
-                                        required>
-                                    <label for="email" class="form-label">Correo
-                                        Electrónico</label>
-                                </div>
-                                <div class="form-floating mb-2">
-                                    <input type="text" class="form-control"
-                                        name="password" id="password"
-                                        placeholder="Contraseña" required>
-                                    <label for="password"
-                                        class="form-label">Contraseña</label>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary"
-                                    data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit"
-                                    class="btn btn-primary">Guardar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {% if usuarios %}
-    <!-- Tabla de Usuarios -->
-    <h1 class="text-center">Lista de Usuarios</h1>
-    <div class="caja">
-        <table class="table table-hover table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th scope="col">Nº</th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Correo</th>
-                    <th scope="col">Password</th>
-                    <th scope="col">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for mostrar in usuarios %}
-                <tr>
-                    <td>{{ mostrar.id }}</td>
-                    <td>{{ mostrar.nombre }}</td>
-                    <td>{{ mostrar.email }}</td>
-                    <td>{{ mostrar.password }}</td>
-                    <td>
-                        <a href="/listar/{{ mostrar.id }}"
-                            class="btn btn-success btn-sm"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modaledit{{ mostrar.id }}">Editar</a>
-                        <a href="javascript:void(0);"
-                            title="Eliminar usuario..."
-                            onclick="confirmarEliminacion('/borraruser/{{ mostrar.id }}')"
-                            class="btn btn-danger btn-sm">Eliminar</a>
-                    </td>
-                </tr>
-
-                <!-- MODAL editar usuario -->
-                <div id="modaledit{{ mostrar.id }}" class="modal fade"
-                    data-bs-backdrop="static" data-bs-keyboard="false"
-                    role="dialog">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header"
-                                style="background: linear-gradient(220deg, #ffffff, #7a9f7a, #355e3b);">
-                                <h4 class="modal-title text-white">Actualizar
-                                    información</h4>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <!-- MODAL -->
-                            <div class="modal-body">
-                                <form action="{{ url_for('updateUsuario') }}"
-                                    method="POST">
-                                    <div class="form-group">
-                                        <label>Nombre</label>
-                                        <input type="hidden" name="id"
-                                            value="{{ mostrar.id }}">
-                                        <input type="text" class="form-control"
-                                            name="nombre"
-                                            value="{{ mostrar.nombre }}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Correo electrónico</label>
-                                        <input type="email" class="form-control"
-                                            name="email"
-                                            value="{{ mostrar.email }}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Password</label>
-                                        <input type="text" class="form-control"
-                                            name="password"
-                                            value="{{ mostrar.password }}">
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button"
-                                        class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Cancelar</button>
-                                    <button class="btn btn-primary"
-                                        type="submit">Actualizar</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <!-- Fin de Editar Usuario Modal -->
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>No hay datos</p>
-        
-        {% endif %}
-    </div>
-</div>
-
 {% endblock %}

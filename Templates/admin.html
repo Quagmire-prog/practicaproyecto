@@ -47,87 +47,43 @@ window.location.href = url;
 });
 }
 </script>
-<div class="container p-5 mt-3">
-    <h2 class=" text-center alert alert-danger py-4">Sistema de Gestión de
-        Productos</h2>
-    <div class="row">
-        <div class="row text-center">
-            <div class="col-sm-4 mb-3 mb-sm-0">
-                <div class="card"
-                    style="background: linear-gradient(180deg, #355e3b, #7a9f7a, #f1eeda);">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <div class="card-body text-white">
-
-                                    <h5 class="card-title">Perfil del
-                                        Usuario</h5>
-                                    <p class="card-text">Mostrar registro de usuarios</p>
-                                    <a href="{{ url_for('listar')}}"
-                                        class="btn btn-outline-success">Ver
-                                        Detalles</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 align-content-center">
-                            <img
-                                src="{{ url_for('static', filename='img/user.png') }}"
-                                class="img-fluid rounded-start"
-                                alt="Agregar Usuario ...">
-                        </div>
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1><i class="bi bi-shield-lock-fill"></i> Sistema de Gestión</h1>
+    </div>
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <i class="bi bi-people-fill" style="font-size: 4rem;"></i>
+                    <h5 class="card-title mt-3">Perfil del Usuario</h5>
+                    <p class="card-text">Mostrar registro de usuarios</p>
+                    <div class="mt-auto">
+                        <a href="{{ url_for('listar')}}" class="btn btn-primary">Ver Detalles</a>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4 mb-3 mb-sm-0">
-                <div class="card"
-                    style="background: linear-gradient(180deg, #042bf1,#367cd9,#ffffff);">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <div class="card-body text-white">
-                                    <h5 class="card-title">Registrar
-                                        Productos</h5>
-                                    <p class="card-text">Agregar los productos al sistema</p>
-                                    <a
-                                        href="{{ url_for('listar_productos_agregados') }}"
-                                        class="btn btn-outline-success">Ver
-                                        Detalles</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 align-content-center">
-                            <a
-                                href="{{ url_for('listar_productos_agregados') }}">
-                                <img
-                                    src="{{ url_for('static', filename='img/agregarp.png') }}"
-                                    class="img-fluid rounded-start"
-                                    alt="..."></a>
-                        </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <i class="bi bi-cart-plus-fill" style="font-size: 4rem;"></i>
+                    <h5 class="card-title mt-3">Registrar Productos</h5>
+                    <p class="card-text">Agregar los productos al sistema</p>
+                    <div class="mt-auto">
+                        <a href="{{ url_for('listar_productos_agregados') }}" class="btn btn-primary">Ver Detalles</a>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4 mb-3 mb-sm-0">
-                <div class="card"
-                    style="background: linear-gradient(180deg, #0b235c,#3d85a9,#e0f7ff);">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <div class="card-body text-white">
-                                    <h5 class="card-title">Visualizar
-                                        Productos</h5>
-                                    <p class="card-text">Muestra lista de productos</p>
-                                    <a href="{{ url_for('listar_productos') }}"
-                                        class="btn btn-outline-success">Ver
-                                        Detalles</a>
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="col-md-4 align-content-center">
-                            <img
-                                src="{{ url_for('static', filename='img/listarp.png') }}"
-                                class="img-fluid rounded-start" alt="...">
-                        </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <i class="bi bi-card-list" style="font-size: 4rem;"></i>
+                    <h5 class="card-title mt-3">Visualizar Productos</h5>
+                    <p class="card-text">Muestra lista de productos</p>
+                    <div class="mt-auto">
+                        <a href="{{ url_for('listar_productos') }}" class="btn btn-primary">Ver Detalles</a>
                     </div>
                 </div>
             </div>

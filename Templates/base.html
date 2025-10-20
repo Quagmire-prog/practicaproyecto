@@ -26,6 +26,13 @@
             font-size: 0.9rem;
         }
     </style>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='Css/custom.css') }}">
 </head>
 
 <body>
@@ -49,9 +56,27 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('acercade') }}">Acerca de</a></li>
                 </ul>
 
-                <!-- Botón Login alineado a la derecha -->
+                <!-- Botones de Perfil o Login -->
                 <div class="d-flex justify-content-center justify-content-lg-end mt-2 mt-lg-0">
-                    <a class="btn btn-light" style="background: linear-gradient(90deg, #1b2c55,#3d85a9,#63cac8,#b8edff);" href="{{ url_for('login') }}">Login</a>
+                    {% if session.nombre %}
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-1"></i> {{ session.nombre }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li class="dropdown-header">
+                                    <h6 class="mb-0">{{ session.nombre }}</h6>
+                                    <small class="text-muted">{{ session.usuario }}</small>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('perfil') }}"><i class="bi bi-person me-2"></i> Ver Perfil</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a class="btn btn-primary" href="{{ url_for('login') }}">Login</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
