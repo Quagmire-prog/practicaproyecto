@@ -73,6 +73,82 @@
                 </ul>
             </div>
         </div>
+
+        <!-- Gráfico de Ventas Mensuales -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">Ventas Mensuales</div>
+                <div class="card-body">
+                    <canvas id="ventasMensualesChart"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div class="row">
+        <!-- Gráfico de Productos Más Vendidos -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">Productos Más Vendidos</div>
+                <div class="card-body">
+                    <canvas id="topProductosChart"></canvas>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfico de Ventas Mensuales
+    const ctxVentas = document.getElementById('ventasMensualesChart').getContext('2d');
+    new Chart(ctxVentas, {
+        type: 'bar',
+        data: {
+            labels: {{ labels_ventas|safe }},
+            datasets: [{
+                label: 'Ventas Mensuales',
+                data: {{ datos_ventas|safe }},
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Gráfico de Productos Más Vendidos
+    const ctxTopProductos = document.getElementById('topProductosChart').getContext('2d');
+    new Chart(ctxTopProductos, {
+        type: 'pie',
+        data: {
+            labels: {{ labels_top_productos|safe }},
+            datasets: [{
+                label: 'Productos Más Vendidos',
+                data: {{ datos_top_productos|safe }},
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+            }]
+        }
+    });
+</script>
 {% endblock %}

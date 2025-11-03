@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mysqldb import MySQL
 from passlib.hash import pbkdf2_sha256
+import json
 
 
 app=Flask(__name__, template_folder='Templates') #crea la app
@@ -195,7 +196,16 @@ def Catalogo():
 @app.route('/admin')
 def admin():
     if 'rol' in session and session['rol'] == 1:
-        return render_template("admin.html", usuario=session.get('usuario'))
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT COUNT(*) as total_productos FROM productos")
+        total_productos = cursor.fetchone()['total_productos']
+        cursor.execute("SELECT COUNT(*) as total_usuarios FROM usuario")
+        total_usuarios = cursor.fetchone()['total_usuarios']
+        cursor.close()
+        return render_template("admin.html", 
+                               usuario=session.get('usuario'), 
+                               total_productos=total_productos, 
+                               total_usuarios=total_usuarios)
     else:
         flash('No tienes permiso para acceder a esta página.', 'danger')
         return redirect(url_for('login'))
@@ -531,7 +541,33 @@ def estadisticas():
     """)
     mejor_cliente = cursor.fetchone()
 
+    # Datos para gráficos
+    cursor.execute("""
+        SELECT DATE_FORMAT(fecha_compra, '%Y-%m') as mes, SUM(precio_total) as total
+        FROM compras
+        GROUP BY mes
+        ORDER BY mes
+    """)
+    ventas_mensuales = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT p.nombreproductos, SUM(c.cantidad) as total_vendido
+        FROM compras c
+        JOIN productos p ON c.id_producto = p.id
+        GROUP BY p.nombreproductos
+        ORDER BY total_vendido DESC
+        LIMIT 5
+    """)
+    top_productos = cursor.fetchall()
+
     cursor.close()
+
+    # Preparar datos para Chart.js
+    labels_ventas = [venta['mes'] for venta in ventas_mensuales]
+    datos_ventas = [float(venta['total']) for venta in ventas_mensuales]
+
+    labels_top_productos = [producto['nombreproductos'] for producto in top_productos]
+    datos_top_productos = [int(producto['total_vendido']) for producto in top_productos]
 
     return render_template('estadisticas.html', 
                            total_productos=total_productos,
@@ -541,7 +577,11 @@ def estadisticas():
                            total_ventas=total_ventas,
                            ingresos_totales=ingresos_totales,
                            producto_mas_vendido=producto_mas_vendido,
-                           mejor_cliente=mejor_cliente)
+                           mejor_cliente=mejor_cliente,
+                           labels_ventas=json.dumps(labels_ventas),
+                           datos_ventas=json.dumps(datos_ventas),
+                           labels_top_productos=json.dumps(labels_top_productos),
+                           datos_top_productos=json.dumps(datos_top_productos))
 
 
 if __name__ == '__main__':
