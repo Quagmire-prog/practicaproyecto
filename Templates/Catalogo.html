@@ -6,34 +6,24 @@
 <div class="container py-5">
     <h2 class="text-center mb-4">Catálogo de Vehículos</h2>
     <div class="row">
+        {% for producto in productos %}
         <div class="col-md-4">
             <div class="card mb-4">
-                <img src="{{ url_for('static', filename='Image/Ford_Raptor.png') }}" class="card-img-top" alt="Vehículo 1">
+                <img src="{{ url_for('static', filename='Image/Ford_Raptor.png') }}" class="card-img-top" alt="{{ producto.nombreproductos }}">
                 <div class="card-body">
-<a href="#" class="btn btn-primary">Ver más</a>
+                    <h5 class="card-title">{{ producto.nombreproductos }}</h5>
+                    <p class="card-text">Precio: ${{ producto.precio }}</p>
+                    <p class="card-text">Stock: {{ producto.stock }}</p>
+                    <form action="{{ url_for('agregar_al_carrito', id_producto=producto.id) }}" method="post">
+                        <div class="input-group mb-3">
+                            <input type="number" name="cantidad" class="form-control" value="1" min="1" max="{{ producto.stock }}">
+                            <button type="submit" class="btn btn-primary">Añadir al carrito</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <img src="{{ url_for('static', filename='Image/buagtti.png') }}" class="card-img-top" alt="Vehículo 2">
-                <div class="card-body">
-                    <h5 class="card-title">Vehículo 2</h5>
-                    <p class="card-text">Descripción del vehículo 2.</p>
-                    <a href="#" class="btn btn-primary">Ver más</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <img src="{{ url_for('static', filename='Image/ram_truck.png') }}" class="card-img-top" alt="Vehículo 3">
-                <div class="card-body">
-                    <h5 class="card-title">Vehículo 3</h5>
-                    <p class="card-text">Descripción del vehículo 3.</p>
-                    <a href="#" class="btn btn-primary">Ver más</a>
-                </div>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

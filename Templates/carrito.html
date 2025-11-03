@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Carrito de Compras{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Carrito de Compras</h2>
+    {% if session.get('carrito') %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set gran_total = [0] %}
+                {% for item in session['carrito'].values() %}
+                    {% set total_item = item.cantidad * item.precio %}
+                    {% if gran_total.append(gran_total.pop() + total_item) %}{% endif %}
+                    <tr>
+                        <td>{{ item.nombre }}</td>
+                        <td>{{ item.cantidad }}</td>
+                        <td>${{ "%.2f"|format(item.precio) }}</td>
+                        <td>${{ "%.2f"|format(total_item) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-right">
+            <h3>Total a Pagar: ${{ "%.2f"|format(gran_total[0]) }}</h3>
+            <form action="{{ url_for('finalizar_compra') }}" method="post">
+                <button type="submit" class="btn btn-success">Finalizar Compra</button>
+            </form>
+        </div>
+    {% else %}
+        <p class="text-center">Tu carrito está vacío.</p>
+    {% endif %}
+</div>
+{% endblock %}

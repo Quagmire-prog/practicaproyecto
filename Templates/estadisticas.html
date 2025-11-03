@@ -1,0 +1,78 @@
+{% extends 'baseadmin.html' %}
+
+{% block titulo %}Estadísticas{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Estadísticas Generales</h2>
+
+    <div class="row">
+        <!-- Estadísticas de Productos -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">Productos</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Total de Productos
+                        <span class="badge bg-primary rounded-pill">{{ total_productos }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Valor Total del Inventario
+                        <span class="badge bg-success rounded-pill">${{ "%.2f"|format(valor_inventario) }}</span>
+                    </li>
+                    {% if producto_mas_stock %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Producto con Más Stock
+                        <span>{{ producto_mas_stock.nombreproductos }} <span class="badge bg-info rounded-pill">{{ producto_mas_stock.stock }}</span></span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Estadísticas de Usuarios -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">Usuarios</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Total de Usuarios
+                        <span class="badge bg-primary rounded-pill">{{ total_usuarios }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Estadísticas de Ventas -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">Ventas</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Total de Ventas
+                        <span class="badge bg-primary rounded-pill">{{ total_ventas }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Ingresos Totales
+                        <span class="badge bg-success rounded-pill">${{ "%.2f"|format(ingresos_totales) }}</span>
+                    </li>
+                    {% if producto_mas_vendido %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Producto Más Vendido
+                        <span>{{ producto_mas_vendido.nombreproductos }} <span class="badge bg-info rounded-pill">{{ producto_mas_vendido.total_vendido }}</span></span>
+                    </li>
+                    {% endif %}
+                    {% if mejor_cliente %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Mejor Cliente
+                        <span>{{ mejor_cliente.nombre }} <span class="badge bg-info rounded-pill">{{ mejor_cliente.total_compras }}</span></span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

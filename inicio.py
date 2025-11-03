@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mysqldb import MySQL
+from passlib.hash import pbkdf2_sha256
 
 
 app=Flask(__name__, template_folder='Templates') #crea la app
@@ -76,11 +77,13 @@ def accesologin():
         password = request.form['password']
         try:
             cursor = mysql.connection.cursor()
-            cursor.execute('SELECT * FROM usuario WHERE email = %s AND password = %s', (email, password))
+            cursor.execute('SELECT * FROM usuario WHERE email = %s', (email,))
             user = cursor.fetchone()
             cursor.close()
 
-            if user:
+            if user and pbkdf2_sha256.verify(password, user['password']):
+                # session['logueado'] = True
+                # session['id'] = user['id']
                 session['usuario'] = user['email']
                 session['rol'] = user['id_rol']
                 session['nombre'] = user['nombre']
@@ -149,7 +152,7 @@ def Registro():
     if request.method == 'POST':
         nombre = request.form.get('nombre')
         email = request.form.get('email')
-        password = request.form.get('password')
+        password = pbkdf2_sha256.hash(request.form['password'])
         id_rol = 2  # Rol usuario por defecto
 
         # Validar que el correo no exista
@@ -183,7 +186,11 @@ def Registro():
 
 @app.route('/Catalogo')
 def Catalogo():
-  return render_template ('Catalogo.html')
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM productos")
+    productos = cursor.fetchall()
+    cursor.close()
+    return render_template('Catalogo.html', productos=productos)
 
 @app.route('/admin')
 def admin():
@@ -359,10 +366,11 @@ def updateUsuario():
     id = request.form['id']
     nombre = request.form['nombre']
     email = request.form['email']
-    password = request.form['password']
-    sql="UPDATE usuario SET nombre=%s, email=%s, password=%s WHERE id=%s"
-    datos=(nombre, email, password, id)
-    
+    password = pbkdf2_sha256.hash(request.form['password'])
+    id_rol = request.form['rol']
+    sql="UPDATE usuario SET nombre=%s, email=%s, password=%s, id_rol=%s WHERE id=%s"
+    datos=(nombre, email, password, id_rol, id)
+
     conexion = mysql.connection
     cursor = conexion.cursor()
     cursor.execute(sql, datos)
@@ -377,6 +385,163 @@ def borraruser(id):
     cur.execute("DELETE FROM usuario WHERE id=%s", (id,))
     mysql.connection.commit()
     return redirect(url_for('listar'))
+
+@app.route('/agregar_al_carrito/<int:id_producto>', methods=['POST'])
+def agregar_al_carrito(id_producto):
+    if 'usuario' not in session:
+        flash('Debes iniciar sesión para comprar.', 'warning')
+        return redirect(url_for('login'))
+
+    cantidad = int(request.form['cantidad'])
+    
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM productos WHERE id = %s", (id_producto,))
+    producto = cursor.fetchone()
+    cursor.close()
+
+    if producto and cantidad > 0:
+        if 'carrito' not in session:
+            session['carrito'] = {}
+        
+        carrito = session['carrito']
+        id_producto_str = str(id_producto)
+
+        if id_producto_str in carrito:
+            carrito[id_producto_str]['cantidad'] += cantidad
+        else:
+            carrito[id_producto_str] = {
+                'nombre': producto['nombreproductos'],
+                'precio': float(producto['precio']),
+                'cantidad': cantidad
+            }
+        
+        session['carrito'] = carrito
+        flash(f'Se agregaron {cantidad} {producto["nombreproductos"]} al carrito.', 'success')
+    else:
+        flash('Producto no encontrado o cantidad inválida.', 'danger')
+
+    return redirect(url_for('Catalogo'))
+
+@app.route('/carrito')
+def carrito():
+    if 'usuario' not in session:
+        flash('Debes iniciar sesión para ver tu carrito.', 'warning')
+        return redirect(url_for('login'))
+
+    return render_template('carrito.html')
+
+@app.route('/finalizar_compra', methods=['POST'])
+def finalizar_compra():
+    if 'usuario' not in session or 'carrito' not in session or not session['carrito']:
+        flash('No hay productos en tu carrito o no has iniciado sesión.', 'warning')
+        return redirect(url_for('carrito'))
+
+    try:
+        cursor = mysql.connection.cursor()
+        
+        # Obtener el id del usuario
+        cursor.execute("SELECT id FROM usuario WHERE email = %s", (session['usuario'],))
+        usuario = cursor.fetchone()
+        id_usuario = usuario['id']
+
+        for id_producto_str, item in session['carrito'].items():
+            id_producto = int(id_producto_str)
+            cantidad = item['cantidad']
+            
+            # Verificar stock
+            cursor.execute("SELECT stock, precio FROM productos WHERE id = %s", (id_producto,))
+            producto = cursor.fetchone()
+            
+            if producto['stock'] >= cantidad:
+                nuevo_stock = producto['stock'] - cantidad
+                precio_total = producto['precio'] * cantidad
+
+                # Insertar en la tabla de compras
+                cursor.execute(
+                    "INSERT INTO compras (id_usuario, id_producto, cantidad, precio_total) VALUES (%s, %s, %s, %s)",
+                    (id_usuario, id_producto, cantidad, precio_total)
+                )
+
+                # Actualizar stock
+                cursor.execute(
+                    "UPDATE productos SET stock = %s WHERE id = %s",
+                    (nuevo_stock, id_producto)
+                )
+            else:
+                flash(f"No hay suficiente stock para {item['nombre']}.", 'danger')
+                return redirect(url_for('carrito'))
+
+        mysql.connection.commit()
+        cursor.close()
+
+        session.pop('carrito', None)
+        return redirect(url_for('gracias'))
+
+    except Exception as e:
+        flash(f'Error al procesar la compra: {e}', 'danger')
+        return redirect(url_for('carrito'))
+
+@app.route('/gracias')
+def gracias():
+    return render_template('gracias.html')
+
+@app.route('/estadisticas')
+def estadisticas():
+    if 'rol' not in session or session['rol'] != 1:
+        flash('No tienes permiso para acceder a esta página.', 'danger')
+        return redirect(url_for('login'))
+
+    cursor = mysql.connection.cursor()
+
+    # Estadísticas de productos
+    cursor.execute("SELECT COUNT(*) as total FROM productos")
+    total_productos = cursor.fetchone()['total']
+    cursor.execute("SELECT SUM(precio * stock) as valor FROM productos")
+    valor_inventario = cursor.fetchone()['valor']
+    cursor.execute("SELECT * FROM productos ORDER BY stock DESC LIMIT 1")
+    producto_mas_stock = cursor.fetchone()
+
+    # Estadísticas de usuarios
+    cursor.execute("SELECT COUNT(*) as total FROM usuario")
+    total_usuarios = cursor.fetchone()['total']
+
+    # Estadísticas de ventas
+    cursor.execute("SELECT COUNT(*) as total FROM compras")
+    total_ventas = cursor.fetchone()['total']
+    cursor.execute("SELECT SUM(precio_total) as total FROM compras")
+    ingresos_totales = cursor.fetchone()['total']
+    
+    cursor.execute("""
+        SELECT p.nombreproductos, SUM(c.cantidad) as total_vendido
+        FROM compras c
+        JOIN productos p ON c.id_producto = p.id
+        GROUP BY p.nombreproductos
+        ORDER BY total_vendido DESC
+        LIMIT 1
+    """)
+    producto_mas_vendido = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT u.nombre, COUNT(c.id) as total_compras
+        FROM compras c
+        JOIN usuario u ON c.id_usuario = u.id
+        GROUP BY u.nombre
+        ORDER BY total_compras DESC
+        LIMIT 1
+    """)
+    mejor_cliente = cursor.fetchone()
+
+    cursor.close()
+
+    return render_template('estadisticas.html', 
+                           total_productos=total_productos,
+                           total_usuarios=total_usuarios,
+                           valor_inventario=valor_inventario,
+                           producto_mas_stock=producto_mas_stock,
+                           total_ventas=total_ventas,
+                           ingresos_totales=ingresos_totales,
+                           producto_mas_vendido=producto_mas_vendido,
+                           mejor_cliente=mejor_cliente)
 
 
 if __name__ == '__main__':

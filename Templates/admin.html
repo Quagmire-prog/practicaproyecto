@@ -88,6 +88,18 @@ window.location.href = url;
                 </div>
             </div>
         </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <i class="bi bi-bar-chart-line-fill" style="font-size: 4rem;"></i>
+                    <h5 class="card-title mt-3">Estadísticas</h5>
+                    <p class="card-text">Muestra estadísticas de ventas y productos</p>
+                    <div class="mt-auto">
+                        <a href="{{ url_for('estadisticas') }}" class="btn btn-primary">Ver Detalles</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

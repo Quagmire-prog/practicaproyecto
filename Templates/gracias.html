@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Gracias por tu compra{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <div class="jumbotron text-center">
+        <h1 class="display-4">¡Gracias por tu compra!</h1>
+        <p class="lead">Tu pedido ha sido procesado exitosamente.</p>
+        <hr class="my-4">
+        <p>Recibirás una confirmación por correo electrónico en breve.</p>
+        <a class="btn btn-primary btn-lg" href="{{ url_for('Catalogo') }}" role="button">Seguir comprando</a>
+    </div>
+</div>
+{% endblock %}
