@@ -560,6 +560,25 @@ def estadisticas():
     """)
     top_productos = cursor.fetchall()
 
+    cursor.execute("""
+        SELECT DAYOFWEEK(fecha_compra) as dia, SUM(precio_total) as total
+        FROM compras
+        GROUP BY dia
+        ORDER BY dia
+    """)
+    ventas_dias = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT HOUR(fecha_compra) as hora, SUM(precio_total) as total
+        FROM compras
+        GROUP BY hora
+        ORDER BY hora
+    """)
+    ventas_horas = cursor.fetchall()
+
+    cursor.execute("SELECT COUNT(DISTINCT id_usuario) as total FROM compras")
+    usuarios_con_compras = cursor.fetchone()['total']
+
     cursor.close()
 
     # Preparar datos para Chart.js
@@ -568,6 +587,16 @@ def estadisticas():
 
     labels_top_productos = [producto['nombreproductos'] for producto in top_productos]
     datos_top_productos = [int(producto['total_vendido']) for producto in top_productos]
+
+    dias_semana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+    labels_ventas_dias = [dias_semana[venta['dia']-1] for venta in ventas_dias]
+    datos_ventas_dias = [float(venta['total']) for venta in ventas_dias]
+
+    labels_ventas_horas = [f"{venta['hora']}:00" for venta in ventas_horas]
+    datos_ventas_horas = [float(venta['total']) for venta in ventas_horas]
+
+    labels_usuarios_compras = ['Usuarios que compran', 'Usuarios que no compran']
+    datos_usuarios_compras = [usuarios_con_compras, total_usuarios - usuarios_con_compras]
 
     return render_template('estadisticas.html', 
                            total_productos=total_productos,
@@ -581,7 +610,13 @@ def estadisticas():
                            labels_ventas=json.dumps(labels_ventas),
                            datos_ventas=json.dumps(datos_ventas),
                            labels_top_productos=json.dumps(labels_top_productos),
-                           datos_top_productos=json.dumps(datos_top_productos))
+                           datos_top_productos=json.dumps(datos_top_productos),
+                           labels_ventas_dias=json.dumps(labels_ventas_dias),
+                           datos_ventas_dias=json.dumps(datos_ventas_dias),
+                           labels_ventas_horas=json.dumps(labels_ventas_horas),
+                           datos_ventas_horas=json.dumps(datos_ventas_horas),
+                           labels_usuarios_compras=json.dumps(labels_usuarios_compras),
+                           datos_usuarios_compras=json.dumps(datos_usuarios_compras))
 
 
 if __name__ == '__main__':

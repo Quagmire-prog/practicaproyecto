@@ -72,6 +72,7 @@
                     <th scope="col">#</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Correo</th>
+                    <th scope="col">Rol</th>
                     <th scope="col">Acciones</th>
                 </tr>
             </thead>
@@ -81,6 +82,7 @@
                     <td>{{ loop.index }}</td>
                     <td>{{ mostrar.nombre }}</td>
                     <td>{{ mostrar.email }}</td>
+                    <td>{{ mostrar.id_rol }}</td>
                     <td>
                         <a href="#" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditUsuario{{ mostrar.id }}">Editar</a>
                         <a href="#" class="btn btn-danger btn-sm btn-eliminar" data-id="{{ mostrar.id }}">Eliminar</a>
@@ -109,6 +111,10 @@
                                     <div class="mb-2">
                                         <label>Contraseña</label>
                                         <input type="text" class="form-control" name="password" value="{{ mostrar.password }}">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label>Rol</label>
+                                        <input type="text" class="form-control" name="rol" value="{{ mostrar.id_rol }}">
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

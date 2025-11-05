@@ -1,8 +1,8 @@
 {% extends 'baseadmin.html' %}
 
-{% block titulo %}Estadísticas{% endblock %}
+{% block title %}Estadísticas{% endblock %}
 
-{% block contenido %}
+{% block body %}
 <div class="container py-5">
     <h2 class="text-center mb-4">Estadísticas Generales</h2>
 
@@ -92,6 +92,37 @@
                 <div class="card-header">Productos Más Vendidos</div>
                 <div class="card-body">
                     <canvas id="topProductosChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Ventas por Día -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">Ventas por Día de la Semana</div>
+                <div class="card-body">
+                    <canvas id="ventasPorDiaChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Ventas por Hora -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">Ventas por Hora del Día</div>
+                <div class="card-body">
+                    <canvas id="ventasPorHoraChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Usuarios que Compran -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">Proporción de Usuarios que Compran</div>
+                <div class="card-body">
+                    <canvas id="usuariosComprasChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -99,7 +130,11 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <script>
+    // Registrar el plugin globalmente
+    Chart.register(ChartDataLabels);
+
     // Gráfico de Ventas Mensuales
     const ctxVentas = document.getElementById('ventasMensualesChart').getContext('2d');
     new Chart(ctxVentas, {
@@ -115,6 +150,15 @@
             }]
         },
         options: {
+            plugins: {
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value, context) => {
+                        return value;
+                    }
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true
@@ -148,6 +192,114 @@
                 ],
                 borderWidth: 1
             }]
+        },
+        options: {
+            plugins: {
+                datalabels: {
+                    formatter: (value, ctx) => {
+                        let sum = 0;
+                        let dataArr = ctx.chart.data.datasets[0].data;
+                        dataArr.map(data => {
+                            sum += data;
+                        });
+                        let percentage = (value*100 / sum).toFixed(2)+"%";
+                        return percentage;
+                    },
+                    color: '#fff',
+                }
+            }
+        }
+    });
+
+    // Gráfico de Ventas por Día
+    const ctxVentasPorDia = document.getElementById('ventasPorDiaChart').getContext('2d');
+    new Chart(ctxVentasPorDia, {
+        type: 'bar',
+        data: {
+            labels: {{ labels_ventas_dias|safe }},
+            datasets: [{
+                label: 'Ventas por Día',
+                data: {{ datos_ventas_dias|safe }},
+                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                borderColor: 'rgba(255, 159, 64, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value, context) => {
+                        return value;
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfico de Ventas por Hora
+    const ctxVentasPorHora = document.getElementById('ventasPorHoraChart').getContext('2d');
+    new Chart(ctxVentasPorHora, {
+        type: 'line',
+        data: {
+            labels: {{ labels_ventas_horas|safe }},
+            datasets: [{
+                label: 'Ventas por Hora',
+                data: {{ datos_ventas_horas|safe }},
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value, context) => {
+                        return value;
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfico de Usuarios que Compran
+    const ctxUsuariosCompras = document.getElementById('usuariosComprasChart').getContext('2d');
+    new Chart(ctxUsuariosCompras, {
+        type: 'pie',
+        data: {
+            labels: {{ labels_usuarios_compras|safe }},
+            datasets: [{
+                label: 'Proporción de Usuarios',
+                data: {{ datos_usuarios_compras|safe }},
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 99, 132, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                datalabels: {
+                    formatter: (value, ctx) => {
+                        let sum = 0;
+                        let dataArr = ctx.chart.data.datasets[0].data;
+                        dataArr.map(data => {
+                            sum += data;
+                        });
+                        let percentage = (value*100 / sum).toFixed(2)+"%";
+                        return percentage;
+                    },
+                    color: '#fff',
+                }
+            }
         }
     });
 </script>

@@ -12,85 +12,120 @@
 <!--recorriendo los mensajes-->
 {%for category, message in msg %}
 <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
-  {{message}}
-  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    {{message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"
+        aria-label="Close"></button>
 </div>
 {%endfor %}
 {%endif %}
 {%endwith %}
 
-
-<div class="container-fluid vh-100" style="background: linear-gradient(135deg, #d8d8d8, #7a7a7a);">
+<div class="container-fluid vh-100"
+    style="background: linear-gradient(135deg, #d8d8d8, #7a7a7a);">
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col col-xl-10">
-                <div class="card shadow-lg" style="border-radius: 1rem; background-color: #9acfcd;">
+                <div class="card shadow-lg"
+                    style="border-radius: 1rem; background-color: #9acfcd;">
                     <div class="row g-0">
 
                         <!-- Panel izquierdo -->
                         <div class="col-md-6 col-lg-5 d-none d-md-flex h-100">
-                            <div class="card-body d-flex flex-column justify-content-center align-items-center p-4 p-md-5 text-white"
-                                 style="background: linear-gradient(135deg, #5078fa, #223bfc); border-radius: 1rem 0 0 1rem; height: 100%; width: 100%;">
-                                
+                            <div
+                                class="card-body d-flex flex-column justify-content-center align-items-center p-4 p-md-5 text-white"
+                                style="background: linear-gradient(135deg, #5078fa, #223bfc); border-radius: 1rem 0 0 1rem; height: 100%; width: 100%;">
+
                                 <!-- Imagen superior -->
                                 <div class="mb-4">
-                                    <img src="{{ url_for('static', filename='Image/inicio.png') }}" alt="Imagen Panel"
-                                         style="width: 200px; height: 200px; object-fit: cover; border-radius: 0;">
+                                    <img
+                                        src="{{ url_for('static', filename='Image/inicio.png') }}"
+                                        alt="Imagen Panel"
+                                        style="width: 200px; height: 200px; object-fit: cover; border-radius: 0;">
                                 </div>
 
                                 <!-- Título -->
-                                <h2 class="fw-bold mb-4 text-center">Bienvenido Nuevamente!</h2>
-                                <p class="mb-5 text-center">Si aun no tienes una cuenta, por favor regístrese aquí</p>
+                                <h2 class="fw-bold mb-4 text-center">Bienvenido
+                                    Nuevamente!</h2>
+                                <p class="mb-5 text-center">Si aun no tienes una
+                                    cuenta, por favor regístrese aquí</p>
 
                                 <!-- Botón Registrarse -->
-                                <a href="{{ url_for('Registro') }}" class="btn btn-lg btn-register" style="background: linear-gradient(90deg, #1b2c55,#3d85a9,#63cac8,#b8edff);">
+                                <a href="{{ url_for('Registro') }}"
+                                    class="btn btn-lg btn-register"
+                                    style="background: linear-gradient(90deg, #1b2c55,#3d85a9,#63cac8,#b8edff);"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom"
+                                    title="Regístrate para obtener una cuenta.">
                                     Registrarse
                                 </a>
                             </div>
                         </div>
 
                         <!-- Panel derecho -->
-                        <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                        <div
+                            class="col-md-6 col-lg-7 d-flex align-items-center">
                             <div class="card-body p-4 p-lg-5 text-dark">
 
-                                <h2 class="fw-bold mb-4 text-center">Iniciar Sesión</h2>
+                                <h2 class="fw-bold mb-4 text-center">Iniciar
+                                    Sesión</h2>
 
                                 <!-- Botón de Google -->
                                 <div class="d-grid mb-4">
-                                    <button class="btn btn-lg d-flex align-items-center justify-content-center btn-google" type="button" style="background: linear-gradient(90deg, #1b2c55,#3d85a9,#63cac8,#b8edff);">
-                                        <img src="{{ url_for('static', filename='Image/googleicon.png') }}" alt="Google"
-                                             style="width: 20px; height: 20px; margin-right: 10px;">
+                                    <button
+                                        class="btn btn-lg d-flex align-items-center justify-content-center btn-google"
+                                        type="button"
+                                        style="background: linear-gradient(90deg, #1b2c55,#3d85a9,#63cac8,#b8edff);"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="bottom"
+                                        title="Iniciar sesión con Google.">
+                                        <img
+                                            src="{{ url_for('static', filename='Image/googleicon.png') }}"
+                                            alt="Google"
+                                            style="width: 20px; height: 20px; margin-right: 10px;">
                                         Iniciar sesión con Google
                                     </button>
                                 </div>
 
                                 <!-- Separador -->
                                 <div class="d-flex justify-content-center my-4">
-                                    <p class="fw-bold mb-0 text-center text-muted">o Iniciar Sesión con una cuenta</p>
+                                    <p
+                                        class="fw-bold mb-0 text-center text-muted">o
+                                        Iniciar Sesión con una cuenta</p>
                                 </div>
 
                                 <!-- Formulario -->
-                                <form action="{{ url_for('accesologin') }}" method="POST">
+                                <form action="{{ url_for('accesologin') }}"
+                                    method="POST">
                                     <div class="form-outline mb-4">
-                                        <input type="email" 
-                                        id="email" 
-                                        name="email"
-                                        class="form-control form-control-lg"
-                                               placeholder="Ingresa tu correo electrónico" 
-                                               required/>
+                                        <input type="email"
+                                            id="email"
+                                            name="email"
+                                            class="form-control form-control-lg"
+                                            placeholder="Ingresa tu correo electrónico"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="bottom"
+                                            title="Ingresa su correo electrónico con el que creó su cuenta."
+                                            required />
                                     </div>
                                     <div class="form-outline mb-4">
                                         <input type="password" id="password"
-                                        name="password"
-                                        class="form-control form-control-lg"
-                                               placeholder="Ingresa tu contraseña" required/>
+                                            name="password"
+                                            class="form-control form-control-lg"
+                                            placeholder="Ingresa tu contraseña"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="bottom"
+                                            title="Ingresa la contraseña con la que se creo la cuenta."
+                                            required />
                                     </div>
 
                                     <!-- Botón Iniciar Sesión -->
                                     <div class="d-grid">
-                                        <button class="btn btn-lg btn-login" 
-                                        type="submit" 
-                                        style="background: linear-gradient(90deg, #1b2c55,#3d85a9,#63cac8,#b8edff);">
+                                        <button class="btn btn-lg btn-login"
+                                            type="submit"
+                                            style="background: linear-gradient(90deg, #1b2c55,#3d85a9,#63cac8,#b8edff);"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="bottom"
+                                            title="Iniciar sesión en tu cuenta.">
                                             Iniciar Sesión
                                         </button>
                                     </div>

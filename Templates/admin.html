@@ -54,48 +54,72 @@ window.location.href = url;
     <div class="row text-center">
         <div class="col-md-4 mb-4">
             <div class="card h-100">
-                <div class="card-body d-flex flex-column justify-content-center">
+                <div
+                    class="card-body d-flex flex-column justify-content-center">
                     <i class="bi bi-people-fill" style="font-size: 4rem;"></i>
-                    <h5 class="card-title mt-3">Perfil del Usuario <span class="badge bg-primary">{{ total_usuarios }}</span></h5>
+                    <h5 class="card-title mt-3">Usuarios </h5>
+                    <h5 class="card-title mt-3">Usuarios Registrados <span
+                            class="badge bg-primary">{{ total_usuarios
+                            }}</span></h5>
                     <p class="card-text">Mostrar registro de usuarios</p>
                     <div class="mt-auto">
-                        <a href="{{ url_for('listar')}}" class="btn btn-primary">Ver Detalles</a>
+                        <a href="{{ url_for('listar')}}" class="btn btn-primary"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="bottom"
+                            title="haz click para ver la lista de usuarios registrados.">Ver
+                            Detalles</a>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
             <div class="card h-100">
-                <div class="card-body d-flex flex-column justify-content-center">
-                    <i class="bi bi-cart-plus-fill" style="font-size: 4rem;"></i>
+                <div
+                    class="card-body d-flex flex-column justify-content-center">
+                    <i class="bi bi-cart-plus-fill"
+                        style="font-size: 4rem;"></i>
                     <h5 class="card-title mt-3">Registrar Productos</h5>
                     <p class="card-text">Agregar los productos al sistema</p>
                     <div class="mt-auto">
-                        <a href="{{ url_for('listar_productos_agregados') }}" class="btn btn-primary">Ver Detalles</a>
+                        <a href="{{ url_for('listar_productos_agregados') }}"
+                            class="btn btn-primary">Ver Detalles</a>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
             <div class="card h-100">
-                <div class="card-body d-flex flex-column justify-content-center">
+                <div
+                    class="card-body d-flex flex-column justify-content-center">
                     <i class="bi bi-card-list" style="font-size: 4rem;"></i>
-                    <h5 class="card-title mt-3">Visualizar Productos <span class="badge bg-primary">{{ total_productos }}</span></h5>
+                    <h5 class="card-title mt-3"> Productos </h5>
+                    <h5 class="card-title mt-3">Productos en Stock <span
+                            class="badge bg-primary">{{ total_productos
+                            }}</span> </h5>
                     <p class="card-text">Muestra lista de productos</p>
                     <div class="mt-auto">
-                        <a href="{{ url_for('listar_productos') }}" class="btn btn-primary">Ver Detalles</a>
+                        <a href="{{ url_for('listar_productos') }}"
+                            class="btn btn-primary"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="bottom"
+                            title="haz click para ver la lista de productos en Stock.">Ver
+                            Detalles</a>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
             <div class="card h-100">
-                <div class="card-body d-flex flex-column justify-content-center">
-                    <i class="bi bi-bar-chart-line-fill" style="font-size: 4rem;"></i>
+                <div
+                    class="card-body d-flex flex-column justify-content-center">
+                    <i class="bi bi-bar-chart-line-fill"
+                        style="font-size: 4rem;"></i>
                     <h5 class="card-title mt-3">Estadísticas</h5>
-                    <p class="card-text">Muestra estadísticas de ventas y productos</p>
+                    <p class="card-text">Muestra estadísticas de ventas y
+                        productos</p>
                     <div class="mt-auto">
-                        <a href="{{ url_for('estadisticas') }}" class="btn btn-primary">Ver Detalles</a>
+                        <a href="{{ url_for('estadisticas') }}"
+                            class="btn btn-primary">Ver Detalles</a>
                     </div>
                 </div>
             </div>
