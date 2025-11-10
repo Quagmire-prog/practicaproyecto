@@ -172,3 +172,6 @@ La aplicación estará disponible en `http://127.0.0.1:343`.
      ├─── login.html
      └─── ... (y demás vistas)
 ```
+
+## Vista Principal
+![alt text](image.png)
