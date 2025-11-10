@@ -4,12 +4,60 @@
 
 {% block contenido %}
 <div class="container py-5">
-    <div class="jumbotron text-center">
-        <h1 class="display-4">¡Gracias por tu compra!</h1>
-        <p class="lead">Tu pedido ha sido procesado exitosamente.</p>
-        <hr class="my-4">
-        <p>Recibirás una confirmación por correo electrónico en breve.</p>
-        <a class="btn btn-primary btn-lg" href="{{ url_for('Catalogo') }}" role="button">Seguir comprando</a>
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow-lg">
+                {% if compra %}
+                    <div class="card-header bg-success text-white text-center">
+                        <h1 class="display-5 mb-0">¡Gracias por tu compra!</h1>
+                    </div>
+                    <div class="card-body p-4">
+                        <h5 class="card-title text-center mb-3">Resumen de tu Pedido</h5>
+                        <p class="text-center text-muted">Pedido realizado el: {{ compra.fecha }}</p>
+                        
+                        <div class="table-responsive my-4">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th class="text-center">Cantidad</th>
+                                        <th class="text-end">Precio</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in compra.carrito.values() %}
+                                        <tr>
+                                            <td>{{ item.nombre }}</td>
+                                            <td class="text-center">{{ item.cantidad }}</td>
+                                            <td class="text-end">${{ "%.2f"|format(item.precio * item.cantidad) }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-light fw-bold">
+                                        <td colspan="2" class="text-end">Total:</td>
+                                        <td class="text-end">${{ "%.2f"|format(compra.total) }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        
+                        <p class="text-center">Recibirás una confirmación por correo electrónico en breve.</p>
+                        <hr>
+                        <div class="text-center">
+                            <a class="btn btn-primary btn-lg" href="{{ url_for('Catalogo') }}" role="button">Seguir comprando</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="card-body text-center p-5">
+                        <h1 class="display-4">¡Gracias!</h1>
+                        <p class="lead">Tu pedido ha sido procesado exitosamente.</p>
+                        <hr class="my-4">
+                        <a class="btn btn-primary btn-lg" href="{{ url_for('Catalogo') }}" role="button">Seguir comprando</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

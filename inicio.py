@@ -247,11 +247,40 @@ def listar_productos():
 
 @app.route('/perfil')
 def perfil():
-    if 'usuario' in session:
-        return render_template('perfil.html', usuario=session['usuario'], nombre=session.get('nombre'))
-    else:
+    if 'usuario' not in session:
         flash('Debes iniciar sesión para ver esta página.', 'warning')
         return redirect(url_for('login'))
+
+    try:
+        cursor = mysql.connection.cursor()
+        
+        # Obtener el id del usuario
+        cursor.execute("SELECT id FROM usuario WHERE email = %s", (session['usuario'],))
+        usuario = cursor.fetchone()
+        
+        if not usuario:
+            flash('Usuario no encontrado.', 'danger')
+            return redirect(url_for('logout'))
+            
+        id_usuario = usuario['id']
+
+        # Obtener historial de compras
+        cursor.execute("""
+            SELECT p.nombreproductos, c.cantidad, c.precio_total, c.fecha_compra
+            FROM compras c
+            JOIN productos p ON c.id_producto = p.id
+            WHERE c.id_usuario = %s
+            ORDER BY c.fecha_compra DESC
+        """, (id_usuario,))
+        compras = cursor.fetchall()
+        
+        cursor.close()
+
+        return render_template('perfil.html', compras=compras)
+
+    except Exception as e:
+        flash(f'Error al cargar el perfil: {e}', 'danger')
+        return redirect(url_for('inicio'))
 
 @app.route('/editar_perfil', methods=['GET', 'POST'])
 def editar_perfil():
@@ -454,6 +483,12 @@ def finalizar_compra():
         usuario = cursor.fetchone()
         id_usuario = usuario['id']
 
+        # Preparar datos para el ticket
+        from datetime import datetime
+        fecha_compra = datetime.now()
+        carrito_final = session['carrito'].copy()
+        compra_total_general = 0
+
         for id_producto_str, item in session['carrito'].items():
             id_producto = int(id_producto_str)
             cantidad = item['cantidad']
@@ -464,12 +499,13 @@ def finalizar_compra():
             
             if producto['stock'] >= cantidad:
                 nuevo_stock = producto['stock'] - cantidad
-                precio_total = producto['precio'] * cantidad
+                precio_total_item = producto['precio'] * cantidad
+                compra_total_general += precio_total_item
 
                 # Insertar en la tabla de compras
                 cursor.execute(
-                    "INSERT INTO compras (id_usuario, id_producto, cantidad, precio_total) VALUES (%s, %s, %s, %s)",
-                    (id_usuario, id_producto, cantidad, precio_total)
+                    "INSERT INTO compras (id_usuario, id_producto, cantidad, precio_total, fecha_compra) VALUES (%s, %s, %s, %s, %s)",
+                    (id_usuario, id_producto, cantidad, precio_total_item, fecha_compra)
                 )
 
                 # Actualizar stock
@@ -484,7 +520,14 @@ def finalizar_compra():
         mysql.connection.commit()
         cursor.close()
 
+        # Guardar detalles para el ticket y limpiar carrito
+        session['ultima_compra'] = {
+            'carrito': carrito_final,
+            'total': compra_total_general,
+            'fecha': fecha_compra.strftime('%Y-%m-%d %H:%M:%S')
+        }
         session.pop('carrito', None)
+        
         return redirect(url_for('gracias'))
 
     except Exception as e:
@@ -493,7 +536,8 @@ def finalizar_compra():
 
 @app.route('/gracias')
 def gracias():
-    return render_template('gracias.html')
+    compra = session.pop('ultima_compra', None)
+    return render_template('gracias.html', compra=compra)
 
 @app.route('/estadisticas')
 def estadisticas():
