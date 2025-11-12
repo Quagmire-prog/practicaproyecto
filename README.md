@@ -172,6 +172,10 @@ La aplicación estará disponible en `http://127.0.0.1:343`.
      ├─── login.html
      └─── ... (y demás vistas)
 ```
+## Crear el archivo:**
+pip freeze > requirements.txt
+## Instalarlo**
+pip install -r requirements.txt
 
 ## Vista Principal
 ![alt text](image.png)

@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.log
+
+# Virtual environment
+venv/
+
+/env
+# Environment variables
+.env
+
+# Flask instance folder
+instance/
+
+# Specific image files
+image.png
+image1.png
+image2.png
+image3.png
+
+# Ignore all images in static/Image/ if they are not meant to be tracked
+# If some images in this folder should be tracked, remove or modify this line.
+static/Image/
