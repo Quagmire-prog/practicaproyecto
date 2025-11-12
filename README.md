@@ -175,3 +175,9 @@ La aplicación estará disponible en `http://127.0.0.1:343`.
 
 ## Vista Principal
 ![alt text](image.png)
+## Vista login
+![alt text](image1.png)
+## Vista catalogo
+![alt text](image2.png)
+## vistra dasboard admin
+![alt text](image3.png)
